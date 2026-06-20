@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Nestara — Front Desk</title>
+<title>Nestara - Front Desk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet" />
@@ -31,8 +31,6 @@
     border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);
     display:flex;flex-direction:column;overflow:hidden;
   }
-
-  /* Header */
   header{
     padding:18px 22px;display:flex;align-items:center;gap:14px;
     background:linear-gradient(115deg,var(--brand-deep),var(--brand) 70%);
@@ -47,7 +45,6 @@
   .title b{font-family:Sora;font-weight:600;font-size:17px;letter-spacing:-.2px}
   .title span{font-size:12.5px;opacity:.85}
   .spacer{flex:1}
-  /* Identity chip — the signature element: mirrors the agent's auth state */
   .chip{
     display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:500;
     background:rgba(255,255,255,.16);padding:7px 12px;border-radius:999px;
@@ -57,11 +54,10 @@
   .chip.verified .dot{background:#7CF0B6;box-shadow:0 0 0 3px rgba(124,240,182,.25)}
   .reset{
     appearance:none;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;
-    font:inherit;font-size:12.5px;padding:7px 12px;border-radius:999px;cursor:pointer;transition:background .15s;
+    font:inherit;font-size:16px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background .15s;
+    display:grid;place-items:center;width:32px;height:32px;line-height:1;
   }
   .reset:hover{background:rgba(255,255,255,.14)}
-
-  /* Messages */
   .stream{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
   .row{display:flex;gap:10px;max-width:86%}
   .row.user{align-self:flex-end;flex-direction:row-reverse}
@@ -80,22 +76,24 @@
   .bubble a{color:var(--brand-deep);font-weight:500}
   .row.user .bubble a{color:#BFD6FF}
   .bubble code{background:rgba(15,30,61,.06);padding:1px 5px;border-radius:5px;font-size:13px}
-
-  /* Typing */
   .typing{display:inline-flex;gap:4px;align-items:center;padding:4px 2px}
   .typing i{width:7px;height:7px;border-radius:50%;background:#A9B7CE;animation:b 1.2s infinite}
-  .typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+  .typing i:nth-child(2){animation-delay:.18s}
+  .typing i:nth-child(3){animation-delay:.36s}
   @keyframes b{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
-
-  /* Quick prompts */
   .quick{display:flex;flex-wrap:wrap;gap:8px;padding:0 22px 6px}
   .quick button{
     font:inherit;font-size:12.5px;color:var(--brand-deep);background:#EEF4FF;
     border:1px solid #DBE6FB;padding:7px 12px;border-radius:999px;cursor:pointer;transition:.15s;
   }
   .quick button:hover{background:#E2ECFF;transform:translateY(-1px)}
-
-  /* Composer */
+  .actions{display:flex;flex-wrap:wrap;gap:8px;padding:8px 22px 0}
+  .actions button{
+    font:inherit;font-size:13px;color:var(--brand-deep);background:#F0F8FF;
+    border:1.5px solid #DBE6FB;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;
+    font-weight:500;
+  }
+  .actions button:hover{background:#E8F2FF;border-color:var(--brand);transform:translateY(-1px)}
   .composer{padding:14px 16px;border-top:1px solid var(--line);background:#FBFCFE}
   .box{display:flex;align-items:flex-end;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:6px 6px 6px 6px;box-shadow:var(--shadow)}
   .box:focus-within{border-color:var(--brand);box-shadow:0 0 0 4px rgba(106,167,255,.16)}
@@ -112,7 +110,6 @@
   .foot{font-size:11px;color:var(--muted);text-align:center;margin-top:9px}
   .foot b{color:var(--brand-ink);font-weight:500}
   .attached{font-size:12px;color:var(--brand-deep);padding:2px 22px 0;display:none}
-
   @media (max-width:560px){
     body{padding:0}.app{height:100vh;border-radius:0;border:none;max-width:100%}
     .row{max-width:92%}
@@ -127,121 +124,171 @@
       <div class="title"><b>Nestara</b><span>Home-loan front desk</span></div>
       <div class="spacer"></div>
       <span class="chip" id="chip" title="Your verification status"><span class="dot"></span><span id="chipText">Guest</span></span>
-      <button class="reset" id="reset" title="Start a new conversation">Reset</button>
+      <button class="reset" id="reset" title="Start a new conversation">&#8634;</button>
     </header>
-
     <div class="stream" id="stream" aria-live="polite"></div>
-
     <div class="quick" id="quick">
-      <button data-q="Hi, I'm an existing customer.">I'm an existing customer</button>
-      <button data-q="I'm interested in a new home loan.">I want a home loan</button>
-      <button data-q="I'd like to talk to an adviser.">Talk to an adviser</button>
+      <button data-q="Hi, I'm an existing customer.">Existing customer</button>
+      <button data-q="I'm interested in a new home loan.">New home loan</button>
+      <button data-q="I'd like to talk to an adviser.">Talk to adviser</button>
       <button data-q="What rates and products do you offer?">Products &amp; rates</button>
     </div>
-
+    <div class="actions" id="actions" style="display:none;"></div>
     <div class="attached" id="attached"></div>
     <div class="composer">
       <div class="box">
         <input type="file" id="file" hidden />
-        <button class="icon-btn" id="attach" title="Attach a document" aria-label="Attach a document">📎</button>
-        <textarea id="input" rows="1" placeholder="Type a message…" autocomplete="off"></textarea>
+        <button class="icon-btn" id="attach" title="Attach a document" aria-label="Attach a document">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+          </svg>
+        </button>
+        <textarea id="input" rows="1" placeholder="Type a message..." autocomplete="off"></textarea>
         <button class="send" id="send" title="Send" aria-label="Send message">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12l16-8-6 16-3-7-7-1z" fill="currentColor"/></svg>
         </button>
       </div>
-      <div class="foot">Nestara is a loan platform, not a lender · <b>Demo</b> — sample data &amp; mocked OTP</div>
+      <div class="foot">Nestara is a loan platform, not a lender - <b>Demo</b> (sample data &amp; mocked OTP)</div>
     </div>
   </div>
-
 <script>
 (function(){
   const stream=document.getElementById('stream'), input=document.getElementById('input'),
         send=document.getElementById('send'), quick=document.getElementById('quick'),
         chip=document.getElementById('chip'), chipText=document.getElementById('chipText'),
         resetBtn=document.getElementById('reset'), fileInput=document.getElementById('file'),
-        attachBtn=document.getElementById('attach'), attached=document.getElementById('attached');
-  let sessionId=null, busy=false, pendingFile=null;
+        attachBtn=document.getElementById('attach'), attached=document.getElementById('attached'),
+        actions=document.getElementById('actions');
+  let sessionId=null, busy=false, pendingFile=null, isVerified=false;
 
-  // ---- rendering -----------------------------------------------------------
-  function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+  function esc(s){return s.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]});}
   function fmt(t){
     let h=esc(t);
     h=h.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
     h=h.replace(/`([^`]+)`/g,'<code>$1</code>');
-    h=h.replace(/(https?:\/\/[^\s)]+)(?![^<]*>)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+    h=h.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+    h=h.replace(/(https?:\/\/[^\s<)"]+)(?![^<]*>)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
     return h.replace(/\n/g,'<br>');
   }
   function add(role,text){
     const row=document.createElement('div'); row.className='row '+role;
-    row.innerHTML=`<div class="avatar">${role==='bot'?'N':'You'}</div><div class="bubble">${fmt(text)}</div>`;
+    const av=role==='bot'?'N':'You';
+    row.innerHTML='<div class="avatar">'+av+'</div><div class="bubble">'+fmt(text)+'</div>';
     stream.appendChild(row); stream.scrollTop=stream.scrollHeight; return row;
   }
   function typing(){
     const row=document.createElement('div'); row.className='row bot';
-    row.innerHTML=`<div class="avatar">N</div><div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div>`;
+    row.innerHTML='<div class="avatar">N</div><div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div>';
     stream.appendChild(row); stream.scrollTop=stream.scrollHeight; return row;
   }
 
-  // Heuristic identity chip — reflects how the conversation is progressing.
-  function updateChip(userText,botText){
-    const b=(botText||'').toLowerCase();
-    const m=botText && botText.match(/\b(?:Hi|Hello|Welcome back),?\s+([A-Z][a-z]+)/);
-    if(m){chip.classList.add('verified'); chipText.textContent=m[1]+' · verified'; return;}
-    if(b.includes('verified')||b.includes("you're all set")||b.includes('thanks for verifying')){
-      chip.classList.add('verified'); chipText.textContent='Verified';
+  function updateChip(clientName, isAuthenticated){
+    if(isAuthenticated && !isVerified){
+      chip.classList.add('verified');
+      chipText.textContent = clientName || 'Verified';
+      isVerified=true;
     }
   }
 
-  // ---- networking ----------------------------------------------------------
+  function updatePlaceholder(){
+    if(isVerified){
+      input.placeholder='Your message...';
+    } else {
+      input.placeholder='Enter your 10-digit mobile number...';
+    }
+  }
+
+  function showActions(botText){
+    const b=(botText||'').toLowerCase();
+    actions.innerHTML='';
+    if(b.indexOf('adviser')>-1 && (b.indexOf('connect')>-1||b.indexOf('reach out')>-1||b.indexOf('like to talk to')>-1)){
+      const actionButtons=[
+        {text:'Phone - Book a Call', q:'Yes, please book a call for me.'},
+        {text:'Email - Email Instead', q:'I prefer to be contacted by email.'},
+        {text:'Browse - Just Browsing', q:'Actually, I am just browsing for now.'}
+      ];
+      for(let i=0;i<actionButtons.length;i++){
+        const btn=actionButtons[i];
+        const el=document.createElement('button');
+        el.textContent=btn.text;
+        el.onclick=function(){sendMessage(btn.q);};
+        actions.appendChild(el);
+      }
+      actions.style.display='flex';
+    } else {
+      actions.style.display='none';
+    }
+  }
+
   async function sendMessage(text){
     if(busy||!text.trim()) return;
-    busy=true; send.disabled=true; quick.style.display='none';
+    busy=true; send.disabled=true; quick.style.display='none'; actions.style.display='none';
     add('user', text);
-    input.value=''; input.style.height='auto';
+    input.value=''; input.style.height='auto'; updatePlaceholder();
     const t=typing();
     try{
       const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({session_id:sessionId, message:text})});
       if(!res.ok) throw new Error('HTTP '+res.status);
       const data=await res.json(); sessionId=data.session_id;
-      t.remove(); const row=add('bot', data.reply||'…');
-      updateChip(text, data.reply);
+      t.remove(); const row=add('bot', data.reply||'...');
+      updateChip(data.client_name, data.is_authenticated);
+      showActions(data.reply);
     }catch(err){
       t.remove();
-      add('bot',"I couldn't reach the server. Make sure it's running (`uvicorn app.main:app --reload`) and your API key is set, then try again.");
+      add('bot',"I couldn't reach the server. Make sure it's running and your API key is set, then try again.");
     }finally{
       busy=false; send.disabled=false; input.focus();
     }
   }
 
-  // ---- composer behaviour --------------------------------------------------
-  input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,120)+'px';});
-  input.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit();}});
+  input.addEventListener('input',function(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,120)+'px';});
+  input.addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit();}});
   send.addEventListener('click',submit);
+  function isValidIndianMobile(text){
+    const digits=text.replace(/\D/g,'');
+    return /^(?:\+?91|0)?([6-9]\d{9})$/.test(digits);
+  }
+  function looksLikePhoneAttempt(text){
+    return /^[\d\s\+\-\(\)]{7,15}$/.test(text.trim());
+  }
+  function showInputError(msg){
+    let err=document.getElementById('inputErr');
+    if(!err){err=document.createElement('div');err.id='inputErr';
+      err.style.cssText='font-size:12px;color:#C0392B;padding:4px 6px 0;';
+      input.parentNode.parentNode.insertBefore(err,input.parentNode.nextSibling);}
+    err.textContent=msg;
+    setTimeout(function(){if(err)err.textContent='';},4000);
+  }
   function submit(){
     let text=input.value.trim();
-    if(pendingFile){ text=(text?text+' — ':'')+'I’ve uploaded my '+pendingFile; pendingFile=null; attached.style.display='none'; }
-    if(text) sendMessage(text);
+    if(pendingFile){ text=(text?text+' - ':'')+'I have uploaded my '+pendingFile; pendingFile=null; attached.style.display='none'; }
+    if(!text) return;
+    if(looksLikePhoneAttempt(text) && !isValidIndianMobile(text)){
+      showInputError('Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.');
+      return;
+    }
+    sendMessage(text);
   }
-  quick.addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) sendMessage(b.dataset.q); });
+  quick.addEventListener('click',function(e){ const b=e.target.closest('button'); if(b) sendMessage(b.dataset.q); });
 
-  attachBtn.addEventListener('click',()=>fileInput.click());
-  fileInput.addEventListener('change',()=>{
+  attachBtn.addEventListener('click',function(){fileInput.click();});
+  fileInput.addEventListener('change',function(){
     if(fileInput.files.length){ pendingFile=fileInput.files[0].name;
-      attached.textContent='📎 Ready to send: '+pendingFile; attached.style.display='block'; input.focus();
+      attached.textContent='Ready to send: '+pendingFile; attached.style.display='block'; input.focus();
       fileInput.value=''; }
   });
 
-  resetBtn.addEventListener('click',async()=>{
-    if(sessionId){ try{ await fetch('/api/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sessionId})}); }catch(e){} }
+  resetBtn.addEventListener('click',function(){
+    if(sessionId){ try{ fetch('/api/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sessionId})}); }catch(e){} }
     sessionId=null; stream.innerHTML=''; chip.classList.remove('verified'); chipText.textContent='Guest';
-    quick.style.display='flex'; greet();
+    isVerified=false; quick.style.display='flex'; actions.style.display='none'; updatePlaceholder(); greet();
   });
 
   function greet(){
-    add('bot',"Hi! I'm Nestara's assistant. I can help with your home-loan application, documents, or finding the right loan.\n\nIf you're an existing customer, share the **mobile number** registered with us. Otherwise, tell me what you're looking for.");
+    add('bot',"Hi! I'm Nestara's assistant. I can help with your home-loan application, documents, or finding the right loan.\n\nIf you're an existing customer, share the mobile number registered with us. Otherwise, tell me what you're looking for.");
   }
-  greet(); input.focus();
+  greet(); updatePlaceholder(); input.focus();
 })();
 </script>
 </body>

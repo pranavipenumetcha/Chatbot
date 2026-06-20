@@ -13,7 +13,9 @@ from app.tools.registry import Scope, tool
     description=(
         "Send a one-time verification code to a mobile number. Use this to verify "
         "a user we don't recognise before collecting personal details or handing "
-        "them to an adviser. Tell the user a code has been sent to their number."
+        "them to an adviser. Tell the user a code has been sent to their number and "
+        "ask them to enter it. Returns: {status: 'sent', phone_masked, "
+        "expires_in_seconds} or {status: 'error', reason: 'invalid_phone'}."
     ),
     parameters={
         "type": "object",
@@ -38,10 +40,20 @@ def send_otp(session: Session, phone: str) -> dict:
 @tool(
     name="verify_otp",
     description=(
-        "Verify the code the user provides. On success the session becomes "
-        "verified. If the number happens to belong to an existing customer, they "
-        "are also authorised for their account. Handles wrong/expired codes — "
-        "read the returned status and respond accordingly."
+        "Verify the OTP code the user provides. Check the 'status' field and "
+        "respond accordingly — do NOT guess or invent outcomes:\n"
+        "  verified → OTP matched; session is now verified. If the number belongs "
+        "to a known customer, 'recognised_client_first_name' is also returned — "
+        "greet them by name.\n"
+        "  mismatch → Wrong code. Tell the user and show how many attempts remain "
+        "('attempts_left'). Offer to re-enter.\n"
+        "  expired  → Code has expired. Offer to send a fresh OTP via send_otp.\n"
+        "  locked   → Too many wrong attempts; the code is now void. Apologise and "
+        "offer to escalate to a human adviser or send a new OTP.\n"
+        "  no_otp   → No active code exists for this number. Offer to send one "
+        "first via send_otp.\n"
+        "  error    → Something went wrong (e.g. invalid phone). Report the "
+        "'reason' and ask the user to check their number."
     ),
     parameters={
         "type": "object",
@@ -59,15 +71,17 @@ def send_otp(session: Session, phone: str) -> dict:
 def verify_otp(session: Session, code: str, phone: str | None = None) -> dict:
     phone = phone or session.scratch.get("otp_phone")
     if not phone:
-        return {"status": "no_otp", "reason": "No number on file — send an OTP first."}
+        return {
+            "status": "no_otp",
+            "reason": "No number on file — send an OTP first.",
+        }
 
     result = otp.verify_otp(phone, code)
     if result.get("status") == "verified":
         session.verified_phone = phone
         if session.role == "unknown":
             session.role = "prospect"
-        # If this verified number is a known customer, authorise their account
-        # (this is the path that matters under the strict policy).
+        # If this verified number is a known customer, authorise their account.
         client = mock_db.find_client(phone)
         if client is not None:
             session.recognized_client_id = client["id"]

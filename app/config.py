@@ -42,8 +42,7 @@ class Settings:
     anthropic_model: str = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
     openai_model: str = os.getenv("OPENAI_MODEL", "gpt-4o")
     # Optional override for the OpenAI-compatible endpoint. Leave blank for real
-    # OpenAI; set it to use a compatible host such as Groq, Together, or a local
-    # server. Groq: https://api.groq.com/openai/v1
+    # OpenAI; set to use a compatible host such as Groq, Together, Cerebras, etc.
     openai_base_url: str | None = os.getenv("OPENAI_BASE_URL") or None
 
     # --- Agent loop -------------------------------------------------------------
@@ -51,7 +50,9 @@ class Settings:
     # leaving comfortable headroom for multi-tool reasoning (lookup -> status ->
     # documents in a single turn, for example).
     max_agent_steps: int = _get_int("MAX_AGENT_STEPS", 6)
-    max_tokens: int = _get_int("MAX_TOKENS", 1024)
+    # 4096 gives comfortable headroom for multi-tool turns.
+    # 1024 was too low and risked truncating replies mid-sentence.
+    max_tokens: int = _get_int("MAX_TOKENS", 4096)
 
     # --- Authentication policy --------------------------------------------------
     # "recognition" : a client identified by their registered number is trusted
@@ -63,9 +64,10 @@ class Settings:
     # --- OTP (mocked) -----------------------------------------------------------
     otp_ttl_seconds: int = _get_int("OTP_TTL_SECONDS", 300)
     otp_max_attempts: int = _get_int("OTP_MAX_ATTEMPTS", 3)
-    # In a real system the code only ever leaves via SMS. For a frictionless demo
-    # we can also echo it back so the presenter doesn't need the server console.
-    otp_dev_echo: bool = _get_bool("OTP_DEV_ECHO", True)
+    # SECURITY: In production the OTP code only ever reaches the user via SMS.
+    # This flag is OFF by default. Set OTP_DEV_ECHO=true in .env only for demos
+    # where you want the presenter to read the code off the server console.
+    otp_dev_echo: bool = _get_bool("OTP_DEV_ECHO", False)
 
     # --- Misc -------------------------------------------------------------------
     log_dir: str = os.getenv("LOG_DIR", "logs")

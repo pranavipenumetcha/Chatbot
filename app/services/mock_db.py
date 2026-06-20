@@ -13,6 +13,7 @@ Contents:
 """
 from __future__ import annotations
 
+import re
 import threading
 from datetime import datetime, timezone
 from typing import Optional
@@ -167,20 +168,31 @@ CLIENTS: dict[str, dict] = {
     },
 }
 
+# Valid Indian mobile: optional +91 / 91 / 0 prefix, then 10 digits starting
+# with 6-9. Same regex used in otp.py — keep them in sync.
+_MOBILE_RE = re.compile(r'^(?:\+?91|0)?([6-9]\d{9})$')
 
-def _normalise_phone(phone: str) -> str:
-    """Reduce a phone string to its trailing 10 digits for resilient matching.
 
-    Users type numbers many ways (+91 98765 43210, 098765-43210, 9876543210).
-    Comparing only the last 10 digits makes lookup forgiving without being loose
-    enough to collide across distinct numbers.
+def _normalise_phone(phone: str) -> str | None:
+    """Extract the 10-digit subscriber number, or None if not a valid Indian mobile.
+
+    Old behaviour (take last 10 digits of any string) was too loose — it would
+    match '13241243414' to '3241243414', incorrectly. Now we validate first.
     """
     digits = "".join(ch for ch in phone if ch.isdigit())
-    return digits[-10:] if len(digits) >= 10 else digits
+    m = _MOBILE_RE.match(digits)
+    return m.group(1) if m else None
 
 
 # Pre-built indexes for O(1) lookup by phone/email.
-_PHONE_INDEX = {_normalise_phone(c["phone"]): c["id"] for c in CLIENTS.values()}
+# _normalise_phone can return None for invalid numbers in the seed data;
+# filter those out so we don't get None keys in the index.
+_PHONE_INDEX: dict[str, str] = {}
+for _c in CLIENTS.values():
+    _norm = _normalise_phone(_c["phone"])
+    if _norm:
+        _PHONE_INDEX[_norm] = _c["id"]
+
 _EMAIL_INDEX = {c["email"].lower(): c["id"] for c in CLIENTS.values()}
 
 
@@ -210,7 +222,8 @@ def find_client(identifier: str) -> Optional[dict]:
     if "@" in ident:
         client_id = _EMAIL_INDEX.get(ident)
     else:
-        client_id = _PHONE_INDEX.get(_normalise_phone(identifier))
+        norm = _normalise_phone(identifier)
+        client_id = _PHONE_INDEX.get(norm) if norm else None
     return CLIENTS.get(client_id) if client_id else None
 
 
