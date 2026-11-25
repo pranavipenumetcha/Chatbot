@@ -1,4 +1,4 @@
-# Nestara — AI Conversational Assistant for Home Loans
+# AI Conversational Assistant for Home Loans
 
 An **agentic** conversational assistant for [Nestara](https://nestara.in/), India's
 AI-powered home-loan platform. It recognises existing clients and answers
